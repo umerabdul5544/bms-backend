@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+
 // Load env from backend/.env first, otherwise fallback to project root ../.env.
 const possibleEnvPaths = [
   path.join(__dirname, '.env'),
@@ -28,11 +29,16 @@ app.use(
         return cb(null, ok);
       }
 
-      // In production, set a strict allowlist via CORS_ORIGINS (comma-separated).
+      // In production, now it checks CORS_ORIGINS variable from Railway.
+      // Make sure to add CORS_ORIGINS = * in Railway Dashboard Variables
       const allowed = (process.env.CORS_ORIGINS || '')
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
+      
+      // If CORS_ORIGINS is '*', allow all
+      if (allowed.includes('*')) return cb(null, true);
+
       return cb(null, allowed.includes(origin));
     },
   })
